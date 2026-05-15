@@ -1,0 +1,13 @@
+services:
+  mailer-mcp:
+    build: .
+    ports:
+      - "${MAILER_MCP_PORT:-3335}:8080"
+    environment:
+      - MCP_AUTH_TOKEN
+      - MAILERSEND_API_KEY
+      - MAILERSEND_FROM_EMAIL=${MAILERSEND_FROM_EMAIL:-donna@itsdonna.events}
+      - MAILERSEND_FROM_NAME=${MAILERSEND_FROM_NAME:-Donna}
+      - MAILER_REQUIRE_CONFIRMATION=true
+      - MAILER_DRY_RUN
+    restart: unless-stopped
