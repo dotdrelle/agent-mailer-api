@@ -29,9 +29,10 @@ app = Server("agent-mailer-api")
 
 _MCP_TOKEN = os.environ.get("MCP_AUTH_TOKEN", "")
 _MAILERSEND_API_KEY = os.environ.get("MAILERSEND_API_KEY", "")
-_MAILERSEND_FROM_EMAIL = os.environ.get("MAILERSEND_FROM_EMAIL", "donna@itsdonna.events")
-_MAILERSEND_FROM_NAME = os.environ.get("MAILERSEND_FROM_NAME", "Donna")
+_MAILERSEND_FROM_EMAIL = os.environ.get("MAILERSEND_FROM_EMAIL", "no-reply@example.com")
+_MAILERSEND_FROM_NAME = os.environ.get("MAILERSEND_FROM_NAME", "Mailer Agent")
 _MAILERSEND_API_URL = os.environ.get("MAILERSEND_API_URL", "https://api.mailersend.com/v1/email")
+_MAILERSEND_USER_AGENT = os.environ.get("MAILERSEND_USER_AGENT", "curl/8.7.1")
 _REQUIRE_CONFIRMATION = os.environ.get("MAILER_REQUIRE_CONFIRMATION", "true").lower() not in {"0", "false", "no"}
 _DEFAULT_DRY_RUN = os.environ.get("MAILER_DRY_RUN", "false").lower() in {"1", "true", "yes"}
 
@@ -206,6 +207,7 @@ def _tool_status() -> list[TextContent]:
             "from": {"email": _MAILERSEND_FROM_EMAIL, "name": _MAILERSEND_FROM_NAME},
             "requireConfirmation": _REQUIRE_CONFIRMATION,
             "defaultDryRun": _DEFAULT_DRY_RUN,
+            "userAgent": _MAILERSEND_USER_AGENT,
         }
     )
 
@@ -286,8 +288,11 @@ def _post_mailersend(payload: dict[str, Any]) -> tuple[int, dict[str, str], str]
         method="POST",
         headers={
             "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Encoding": "identity",
             "X-Requested-With": "XMLHttpRequest",
             "Authorization": f"Bearer {_MAILERSEND_API_KEY}",
+            "User-Agent": _MAILERSEND_USER_AGENT,
         },
     )
     try:

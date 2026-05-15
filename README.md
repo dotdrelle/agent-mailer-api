@@ -21,14 +21,14 @@ for explicit user approval. `dryRun=true` never sends.
 
 ```bash
 export MAILERSEND_API_KEY=...
-export MAILERSEND_FROM_EMAIL=donna@itsdonna.events
-export MAILERSEND_FROM_NAME=Donna
+export MAILERSEND_FROM_EMAIL=no-reply@example.com
+export MAILERSEND_FROM_NAME="Mailer Agent"
+export MAILERSEND_USER_AGENT=curl/8.7.1
 ```
 
 Optional:
 
 ```bash
-export MCP_AUTH_TOKEN=local-token
 export MAILER_MCP_PORT=3335
 export MAILER_DRY_RUN=true
 ```
