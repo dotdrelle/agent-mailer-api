@@ -4,6 +4,7 @@ services:
     ports:
       - "${MAILER_MCP_PORT:-3335}:8080"
     environment:
+      - MCP_AUTH_TOKEN
       - MAILERSEND_API_KEY
       - MAILERSEND_FROM_EMAIL=${MAILERSEND_FROM_EMAIL:-no-reply@example.com}
       - MAILERSEND_FROM_NAME=${MAILERSEND_FROM_NAME:-Mailer Agent}

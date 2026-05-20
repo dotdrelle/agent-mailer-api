@@ -29,6 +29,7 @@ export MAILERSEND_USER_AGENT=curl/8.7.1
 Optional:
 
 ```bash
+export MCP_AUTH_TOKEN=local-token
 export MAILER_MCP_PORT=3335
 export MAILER_DRY_RUN=true
 ```
