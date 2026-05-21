@@ -56,6 +56,14 @@ Streamable HTTP requests to the same URL.
 
 ## Manager Integration
 
-`llm-wiki-manager` runs this service like `agent-cme`: the manager compose pulls
-the Docker image, maps a local port, and passes `MAILER_MCP_PROXY_URL` to
-`llm-wiki serve` so `/chat` can connect to it as `donna-mailer`.
+`agent-mailer-api` is external infrastructure for `llm-wiki-manager`. Run it
+separately and keep `MAILERSEND_*` secrets in this service's environment. The
+manager only needs the MCP endpoint URL and the same bearer token:
+
+```env
+MAILER_MCP_PROXY_URL=http://host.docker.internal:3335/mcp/
+MAILER_MCP_AUTH_TOKEN=local-token
+```
+
+`llm-wiki serve` uses those values to connect `/chat` to the mailer as
+`donna-mailer`.
