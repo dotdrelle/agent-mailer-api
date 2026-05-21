@@ -5,6 +5,7 @@ import asyncio
 import contextlib
 import json
 import os
+import ssl
 import time
 import urllib.error
 import urllib.request
@@ -33,6 +34,7 @@ _MAILERSEND_FROM_EMAIL = os.environ.get("MAILERSEND_FROM_EMAIL", "no-reply@examp
 _MAILERSEND_FROM_NAME = os.environ.get("MAILERSEND_FROM_NAME", "Mailer Agent")
 _MAILERSEND_API_URL = os.environ.get("MAILERSEND_API_URL", "https://api.mailersend.com/v1/email")
 _MAILERSEND_USER_AGENT = os.environ.get("MAILERSEND_USER_AGENT", "curl/8.7.1")
+_MAILERSEND_VERIFY_SSL = os.environ.get("MAILERSEND_VERIFY_SSL", "true").lower() not in {"0", "false", "no"}
 _REQUIRE_CONFIRMATION = os.environ.get("MAILER_REQUIRE_CONFIRMATION", "true").lower() not in {"0", "false", "no"}
 _DEFAULT_DRY_RUN = os.environ.get("MAILER_DRY_RUN", "false").lower() in {"1", "true", "yes"}
 
@@ -40,6 +42,8 @@ if not _MCP_TOKEN:
     print("[mailer-mcp] Warning: MCP_AUTH_TOKEN is not configured; the endpoint accepts unauthenticated clients.")
 if not _MAILERSEND_API_KEY:
     print("[mailer-mcp] Warning: MAILERSEND_API_KEY is not configured; send calls will fail unless dryRun=true.")
+if not _MAILERSEND_VERIFY_SSL:
+    print("[mailer-mcp] Warning: MAILERSEND_VERIFY_SSL is disabled; MailerSend TLS certificates will not be verified.")
 
 
 class _BearerAuthMiddleware(BaseHTTPMiddleware):
@@ -295,13 +299,21 @@ def _post_mailersend(payload: dict[str, Any]) -> tuple[int, dict[str, str], str]
             "User-Agent": _MAILERSEND_USER_AGENT,
         },
     )
+    ssl_context = None if _MAILERSEND_VERIFY_SSL else _unverified_ssl_context()
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with urllib.request.urlopen(request, timeout=30, context=ssl_context) as response:
             response_body = response.read().decode("utf-8", errors="replace")
             return response.status, dict(response.headers.items()), response_body
     except urllib.error.HTTPError as exc:
         response_body = exc.read().decode("utf-8", errors="replace")
         return exc.code, dict(exc.headers.items()), response_body
+
+
+def _unverified_ssl_context() -> ssl.SSLContext:
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+    return context
 
 
 def create_starlette_app() -> Starlette:

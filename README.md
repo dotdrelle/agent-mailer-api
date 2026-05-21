@@ -32,7 +32,10 @@ Optional:
 export MCP_AUTH_TOKEN=local-token
 export MAILER_MCP_PORT=3335
 export MAILER_DRY_RUN=true
+export MAILERSEND_VERIFY_SSL=true
 ```
+
+Set `MAILERSEND_VERIFY_SSL=false` only for local debugging behind a trusted TLS-intercepting proxy.
 
 ## Run Locally
 
