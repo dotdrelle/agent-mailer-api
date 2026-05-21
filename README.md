@@ -31,9 +31,11 @@ Optional:
 ```bash
 export MCP_AUTH_TOKEN=local-token
 export MAILER_MCP_PORT=3335
-export MAILER_DRY_RUN=true
+export MAILER_DRY_RUN=false
 export MAILERSEND_VERIFY_SSL=true
 ```
+
+The standalone Docker Compose file defaults optional values to empty strings, `MAILER_DRY_RUN=false`, and `MAILERSEND_VERIFY_SSL=true` to avoid interpolation warnings.
 
 Set `MAILERSEND_VERIFY_SSL=false` only for local debugging behind a trusted TLS-intercepting proxy.
 
