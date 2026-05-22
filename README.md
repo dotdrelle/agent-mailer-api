@@ -1,5 +1,7 @@
 # agent-mailer-api
 
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue)](LICENSE)
+
 Send-only MCP server for MailerSend.
 
 `agent-mailer-api` is intentionally small: it exposes MailerSend as a
@@ -20,8 +22,8 @@ for explicit user approval. `dryRun=true` never sends.
 ## Configuration
 
 ```bash
-export MAILERSEND_API_KEY=...
-export MAILERSEND_FROM_EMAIL=no-reply@example.com
+export MAILERSEND_API_KEY=<mailersend-api-key>
+export MAILERSEND_FROM_EMAIL=<sender@example.com>
 export MAILERSEND_FROM_NAME="Mailer Agent"
 export MAILERSEND_USER_AGENT=curl/8.7.1
 ```
@@ -29,7 +31,7 @@ export MAILERSEND_USER_AGENT=curl/8.7.1
 Optional:
 
 ```bash
-export MCP_AUTH_TOKEN=local-token
+export MCP_AUTH_TOKEN=<generated-local-token>
 export MAILER_MCP_PORT=3335
 export MAILER_DRY_RUN=false
 export MAILERSEND_VERIFY_SSL=true
@@ -62,8 +64,12 @@ manager only needs the MCP endpoint URL and the same bearer token:
 
 ```env
 MAILER_MCP_PROXY_URL=http://host.docker.internal:3335/mcp/
-MAILER_MCP_AUTH_TOKEN=local-token
+MAILER_MCP_AUTH_TOKEN=<same-generated-local-token>
 ```
 
 `llm-wiki serve` uses those values to connect `/chat` to the mailer as
 `donna-mailer`.
+
+## License
+
+Released under the **PolyForm Noncommercial License 1.0.0**. See [LICENSE](LICENSE).
