@@ -28,6 +28,7 @@ import uvicorn
 
 app = Server("agent-mailer-api")
 
+_AGENT_VERSION = "0.5.1"
 _MCP_TOKEN = os.environ.get("MCP_AUTH_TOKEN", "")
 _MAILERSEND_API_KEY = os.environ.get("MAILERSEND_API_KEY", "")
 _MAILERSEND_FROM_EMAIL = os.environ.get("MAILERSEND_FROM_EMAIL", "no-reply@example.com")
@@ -119,6 +120,7 @@ def _render_landing_page(endpoint_url: str, scheme: str) -> str:
     <section class="panel">
       <dl>
         <dt>Status</dt><dd>Ready</dd>
+        <dt>Version</dt><dd><code>{_escape_html(_AGENT_VERSION)}</code></dd>
         <dt>Endpoint</dt><dd><code>{_escape_html(endpoint_url)}</code></dd>
         <dt>Transport</dt><dd>MCP Streamable HTTP over {_escape_html(scheme.upper())}</dd>
         <dt>Authentication</dt><dd>{_escape_html(auth_status)}</dd>
@@ -206,6 +208,7 @@ def _tool_status() -> list[TextContent]:
         {
             "ok": True,
             "service": "agent-mailer-api",
+            "version": _AGENT_VERSION,
             "provider": "mailersend",
             "apiKeyConfigured": bool(_MAILERSEND_API_KEY),
             "from": {"email": _MAILERSEND_FROM_EMAIL, "name": _MAILERSEND_FROM_NAME},
