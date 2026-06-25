@@ -28,6 +28,8 @@ MailerSend API key in the service environment.
   account actions here.
 - Keep TLS verification enabled by default. `MAILERSEND_VERIFY_SSL=false` is
   only for local debugging behind a trusted TLS-intercepting proxy.
+- Keep `_AGENT_VERSION` aligned with the coordinated `llm-wiki-manager`
+  release version so status responses identify the deployed agent bundle.
 
 ## Common Commands
 
