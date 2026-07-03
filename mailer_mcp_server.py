@@ -29,7 +29,7 @@ import uvicorn
 
 app = Server("agent-mailer-api")
 
-_AGENT_VERSION = "0.9.3"
+_AGENT_VERSION = "0.9.4"
 _MCP_TOKEN = os.environ.get("MCP_AUTH_TOKEN", "")
 _MAILERSEND_API_KEY = os.environ.get("MAILERSEND_API_KEY", "")
 _MAILERSEND_FROM_EMAIL = os.environ.get("MAILERSEND_FROM_EMAIL", "no-reply@example.com")
