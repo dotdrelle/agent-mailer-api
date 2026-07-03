@@ -28,9 +28,19 @@ MailerSend API key in the service environment.
   account actions here.
 - Keep TLS verification enabled by default. `MAILERSEND_VERIFY_SSL=false` is
   only for local debugging behind a trusted TLS-intercepting proxy.
+- `MAILERSEND_CA_CERT` (optional): path to a CA bundle passed as `cafile` to
+  `ssl.create_default_context()` when verification is on. **Open question, not
+  yet resolved:** this may duplicate the manager's `--cacert` mechanism
+  (`llm-wiki-manager/CLAUDE.md`, Docker And Security), which already injects
+  `SSL_CERT_FILE` into agent containers — and `create_default_context()`
+  without an explicit `cafile` already honors `SSL_CERT_FILE`. Do not remove
+  `MAILERSEND_CA_CERT` without deciding whether `--cacert` alone is sufficient
+  for this service.
 - Keep `_AGENT_VERSION` aligned with the coordinated `llm-wiki-manager`
   release version so status responses identify the deployed agent bundle.
-  Current release line: `0.7.0`.
+  Current release line: `0.9.4`. Alignment is checked by
+  `llm-wiki-manager/scripts/check-versions.js` and synced by the root
+  `build-and-push.sh`.
 - MCP tool descriptions, `_activity` metadata, status page text, previews, and
   operator-facing errors must stay in English. Email body content is provided by
   the caller and may be in any language.
