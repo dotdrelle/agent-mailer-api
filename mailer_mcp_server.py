@@ -5,6 +5,7 @@ import asyncio
 import contextlib
 import json
 import os
+import re
 import ssl
 import time
 import urllib.error
@@ -36,6 +37,7 @@ _MAILERSEND_FROM_NAME = os.environ.get("MAILERSEND_FROM_NAME", "Mailer Agent")
 _MAILERSEND_API_URL = os.environ.get("MAILERSEND_API_URL", "https://api.mailersend.com/v1/email")
 _MAILERSEND_USER_AGENT = os.environ.get("MAILERSEND_USER_AGENT", "curl/8.7.1")
 _MAILERSEND_VERIFY_SSL = os.environ.get("MAILERSEND_VERIFY_SSL", "true").lower() not in {"0", "false", "no"}
+_MAILERSEND_CA_CERT = os.environ.get("MAILERSEND_CA_CERT", "")
 _REQUIRE_CONFIRMATION = os.environ.get("MAILER_REQUIRE_CONFIRMATION", "true").lower() not in {"0", "false", "no"}
 _DEFAULT_DRY_RUN = os.environ.get("MAILER_DRY_RUN", "false").lower() in {"1", "true", "yes"}
 
@@ -76,6 +78,13 @@ def _json_text(payload: dict[str, Any]) -> list[TextContent]:
     return [TextContent(type="text", text=json.dumps(payload, ensure_ascii=False, indent=2))]
 
 
+def _mask_secret_text(value: Any) -> str:
+    text = str(value)
+    text = re.sub(r"(?i)(authorization:\s*bearer\s+)[^\s,;]+", r"\1***", text)
+    text = re.sub(r"(?i)(api[_-]?key|token|secret|password)(['\"]?\s*[:=]\s*['\"]?)[^'\"\s,;]+", r"\1\2***", text)
+    return text
+
+
 def _render_landing_page(endpoint_url: str, scheme: str) -> str:
     auth_status = (
         "Bearer token enabled"
@@ -84,6 +93,11 @@ def _render_landing_page(endpoint_url: str, scheme: str) -> str:
     )
     api_status = "configured" if _MAILERSEND_API_KEY else "missing MAILERSEND_API_KEY"
     confirm = "required" if _REQUIRE_CONFIRMATION else "not required"
+    tls_status = "verified"
+    if _MAILERSEND_CA_CERT:
+        tls_status = f"verified with CA {_MAILERSEND_CA_CERT}"
+    if not _MAILERSEND_VERIFY_SSL:
+        tls_status = "not verified"
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -125,6 +139,7 @@ def _render_landing_page(endpoint_url: str, scheme: str) -> str:
         <dt>Transport</dt><dd>MCP Streamable HTTP over {_escape_html(scheme.upper())}</dd>
         <dt>Authentication</dt><dd>{_escape_html(auth_status)}</dd>
         <dt>MailerSend</dt><dd>{_escape_html(api_status)}</dd>
+        <dt>TLS</dt><dd>{_escape_html(tls_status)}</dd>
         <dt>From</dt><dd><code>{_escape_html(_MAILERSEND_FROM_EMAIL)}</code></dd>
         <dt>Confirmation</dt><dd>{_escape_html(confirm)}</dd>
       </dl>
@@ -199,7 +214,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         print(f"[mailer-mcp] tools/result {name} ok {int((time.time() - start) * 1000)}ms")
         return result
     except Exception as exc:
-        print(f"[mailer-mcp] tools/result {name} error {int((time.time() - start) * 1000)}ms {exc}")
+        print(f"[mailer-mcp] tools/result {name} error {int((time.time() - start) * 1000)}ms {_mask_secret_text(exc)}")
         return _json_text({"ok": False, "error": str(exc)})
 
 
@@ -215,6 +230,10 @@ def _tool_status() -> list[TextContent]:
             "requireConfirmation": _REQUIRE_CONFIRMATION,
             "defaultDryRun": _DEFAULT_DRY_RUN,
             "userAgent": _MAILERSEND_USER_AGENT,
+            "tls": {
+                "verifySsl": _MAILERSEND_VERIFY_SSL,
+                "caCertConfigured": bool(_MAILERSEND_CA_CERT),
+            },
         }
     )
 
@@ -302,7 +321,7 @@ def _post_mailersend(payload: dict[str, Any]) -> tuple[int, dict[str, str], str]
             "User-Agent": _MAILERSEND_USER_AGENT,
         },
     )
-    ssl_context = None if _MAILERSEND_VERIFY_SSL else _unverified_ssl_context()
+    ssl_context = _MAILERSEND_SSL_CONTEXT
     try:
         with urllib.request.urlopen(request, timeout=30, context=ssl_context) as response:
             response_body = response.read().decode("utf-8", errors="replace")
@@ -312,11 +331,16 @@ def _post_mailersend(payload: dict[str, Any]) -> tuple[int, dict[str, str], str]
         return exc.code, dict(exc.headers.items()), response_body
 
 
-def _unverified_ssl_context() -> ssl.SSLContext:
+def _mailersend_ssl_context() -> ssl.SSLContext | None:
+    if _MAILERSEND_VERIFY_SSL:
+        return ssl.create_default_context(cafile=_MAILERSEND_CA_CERT or None)
     context = ssl.create_default_context()
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
     return context
+
+
+_MAILERSEND_SSL_CONTEXT = _mailersend_ssl_context()
 
 
 def create_starlette_app() -> Starlette:
