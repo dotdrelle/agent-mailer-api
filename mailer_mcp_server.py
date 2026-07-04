@@ -50,7 +50,11 @@ _MAILERSEND_CA_CERT = os.environ.get("MAILERSEND_CA_CERT", "")
 _REQUIRE_CONFIRMATION = os.environ.get("MAILER_REQUIRE_CONFIRMATION", "true").lower() not in {"0", "false", "no"}
 _DEFAULT_DRY_RUN = os.environ.get("MAILER_DRY_RUN", "false").lower() in {"1", "true", "yes"}
 
-if not (_MCP_TOKEN or _MCP_READ_TOKEN or _MCP_WRITE_TOKEN):
+def _any_token_configured() -> bool:
+    return bool(_MCP_TOKEN or _MCP_READ_TOKEN or _MCP_WRITE_TOKEN)
+
+
+if not _any_token_configured():
     print("[mailer-mcp] Warning: MCP_AUTH_TOKEN is not configured; the endpoint accepts unauthenticated clients.")
 if not _MAILERSEND_API_KEY:
     print("[mailer-mcp] Warning: MAILERSEND_API_KEY is not configured; send calls will fail unless dryRun=true.")
@@ -64,7 +68,7 @@ def _bearer_token(request: Request) -> str:
 
 
 def _token_scopes(token: str) -> set[str] | None:
-    if not (_MCP_TOKEN or _MCP_READ_TOKEN or _MCP_WRITE_TOKEN):
+    if not _any_token_configured():
         return {"read", "write"}
     if _MCP_TOKEN and hmac.compare_digest(token, _MCP_TOKEN):
         return {"read", "write"}

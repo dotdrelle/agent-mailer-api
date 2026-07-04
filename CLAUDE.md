@@ -49,7 +49,11 @@ MailerSend API key in the service environment.
   threaded through a `contextvars.ContextVar` set by
   `_BearerAuthMiddleware`, not passed explicitly. Requests are rate-limited
   (`MCP_RATE_LIMIT_REQUESTS`/`MCP_RATE_LIMIT_WINDOW_SECONDS`, default
-  120/60s) keyed by token or remote IP.
+  120/60s) keyed by token or remote IP. `_any_token_configured()` is the
+  single "is any token set" check. This whole block is copy-pasted
+  near-verbatim across all four agent repos plus `llm-wiki`'s `mcpHttp.ts`
+  (TypeScript) — see `agent-cme/CLAUDE.md`'s fuller note on why that hasn't
+  been consolidated into a shared package.
 - MCP tool descriptions, `_activity` metadata, status page text, previews, and
   operator-facing errors must stay in English. Email body content is provided by
   the caller and may be in any language.
