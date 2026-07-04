@@ -38,7 +38,7 @@ MailerSend API key in the service environment.
   for this service.
 - Keep `_AGENT_VERSION` aligned with the coordinated `llm-wiki-manager`
   release version so status responses identify the deployed agent bundle.
-  Current release line: `0.10.1`. Alignment is checked by
+  Current release line: `0.11.1`. Alignment is checked by
   `llm-wiki-manager/scripts/check-versions.js` and synced by the root
   `build-and-push.sh`.
 - **Auth, scopes, rate limiting** (0.10.3): `MCP_AUTH_TOKEN` remains a legacy
@@ -54,6 +54,12 @@ MailerSend API key in the service environment.
   near-verbatim across all four agent repos plus `llm-wiki`'s `mcpHttp.ts`
   (TypeScript) — see `agent-cme/CLAUDE.md`'s fuller note on why that hasn't
   been consolidated into a shared package.
+- **Multi-user status** (0.11.0): 0.11.0 is an industrialized single-user
+  deployment baseline across the wikiLLM workspace; the multi-user model is
+  specified in `llm-wiki/docs/industrialisation.md` and planned for 0.12.0 —
+  see `agent-cme/CLAUDE.md`'s fuller note. This agent's token scoping is
+  read/write, not per-user; do not deploy it as a shared endpoint for
+  distinct end users before that lot lands.
 - MCP tool descriptions, `_activity` metadata, status page text, previews, and
   operator-facing errors must stay in English. Email body content is provided by
   the caller and may be in any language.
