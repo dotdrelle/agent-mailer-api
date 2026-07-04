@@ -119,6 +119,18 @@ class MailerMcpServerTest(unittest.TestCase):
         self.assertNotIn("foo", masked)
         self.assertNotIn("bar", masked)
 
+    def test_read_scope_cannot_send_email(self):
+        token = self.server._CURRENT_SCOPES.set({"read"})
+        try:
+            denied = self.server._require_tool_scope("mailer_send_email")
+            allowed = self.server._require_tool_scope("mailer_status")
+        finally:
+            self.server._CURRENT_SCOPES.reset(token)
+
+        self.assertFalse(self.payload(denied)["ok"])
+        self.assertIn("write scope", self.payload(denied)["error"])
+        self.assertIsNone(allowed)
+
 
 if __name__ == "__main__":
     unittest.main()

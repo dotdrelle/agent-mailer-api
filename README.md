@@ -70,6 +70,12 @@ MAILER_MCP_AUTH_TOKEN=<same-generated-local-token>
 `llm-wiki serve` uses those values to connect `/chat` to the mailer as
 `donna-mailer`.
 
+For scoped HTTP access, set `MCP_READ_TOKEN` for status-only clients and
+`MCP_WRITE_TOKEN` for clients allowed to call `mailer_send_email`.
+`MCP_AUTH_TOKEN` remains a legacy full-access read+write token. Rate limiting
+defaults to 120 requests per 60 seconds and can be tuned with
+`MCP_RATE_LIMIT_REQUESTS` and `MCP_RATE_LIMIT_WINDOW_SECONDS`.
+
 ## License
 
 Released under the **PolyForm Noncommercial License 1.0.0**. See [LICENSE](LICENSE).
