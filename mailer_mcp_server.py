@@ -31,7 +31,7 @@ import uvicorn
 
 app = Server("agent-mailer-api")
 
-_AGENT_VERSION = "0.14.2"
+_AGENT_VERSION = "0.14.5"
 _MCP_TOKEN = os.environ.get("MCP_AUTH_TOKEN", "")
 _MCP_READ_TOKEN = os.environ.get("MCP_READ_TOKEN", "")
 _MCP_WRITE_TOKEN = os.environ.get("MCP_WRITE_TOKEN", "")

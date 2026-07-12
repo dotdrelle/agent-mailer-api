@@ -4,6 +4,8 @@
 
 Send-only MCP server for MailerSend.
 
+Current coordinated release: **0.14.5**.
+
 `agent-mailer-api` is intentionally small: it exposes MailerSend as a
 Streamable HTTP MCP server so an AI agent can send approved emails without
 learning MailerSend API details or seeing the API key.
