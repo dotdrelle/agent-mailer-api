@@ -31,7 +31,7 @@ import uvicorn
 
 app = Server("agent-mailer-api")
 
-_AGENT_VERSION = "0.14.1"
+_AGENT_VERSION = "0.14.2"
 _MCP_TOKEN = os.environ.get("MCP_AUTH_TOKEN", "")
 _MCP_READ_TOKEN = os.environ.get("MCP_READ_TOKEN", "")
 _MCP_WRITE_TOKEN = os.environ.get("MCP_WRITE_TOKEN", "")
@@ -228,7 +228,8 @@ async def list_tools() -> list[Tool]:
             name="mailer_send_email",
             description=(
                 "Send an email through MailerSend. Use only after the user explicitly asks to send an email "
-                "and the recipient, subject, and body are known. If confirmation is required, set confirmed=true "
+                "and the recipient, subject, and body are known. Provide at least one body — text and/or html. "
+                "If confirmation is required, set confirmed=true "
                 "only when the user has clearly approved the send. Use dryRun=true to preview without sending."
             ),
             inputSchema={
