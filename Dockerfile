@@ -4,10 +4,9 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir \
-    "mcp>=1.9.4" \
+    "mcp>=1.9.4,<2" \
     starlette \
     uvicorn
-
 COPY mailer_mcp_server.py .
 
 ENV MCP_HOST=0.0.0.0
