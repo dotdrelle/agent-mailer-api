@@ -302,13 +302,29 @@ def _tool_status() -> list[TextContent]:
     )
 
 
+def _parse_bool(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int) and value in (0, 1):
+        return bool(value)
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "on"}:
+            return True
+        if normalized in {"false", "0", "no", "off", ""}:
+            return False
+    raise ValueError(f"Expected a boolean, got: {value!r}")
+
+
 async def _tool_send_email(args: dict[str, Any]) -> list[TextContent]:
     to = str(args.get("to", "")).strip()
     subject = str(args.get("subject", "")).strip()
     text = str(args.get("text", "") or "")
     html = str(args.get("html", "") or "")
-    dry_run = bool(args.get("dryRun", _DEFAULT_DRY_RUN))
-    confirmed = bool(args.get("confirmed", False))
+    dry_run = _parse_bool(args.get("dryRun"), _DEFAULT_DRY_RUN)
+    confirmed = _parse_bool(args.get("confirmed"), False)
 
     if not to or "@" not in to:
         raise ValueError("A valid recipient email is required.")

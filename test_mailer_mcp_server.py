@@ -112,6 +112,29 @@ class MailerMcpServerTest(unittest.TestCase):
                 "dryRun": False,
             }))
 
+    def test_string_false_does_not_bypass_confirmation(self):
+        self.server._MAILERSEND_API_KEY = "secret-key"
+        # bool("false") is True in Python; a string-serialized flag must not
+        # slip past the confirmation gate.
+        with self.assertRaisesRegex(ValueError, "confirmed=true"):
+            asyncio.run(self.server._tool_send_email({
+                "to": "user@example.com",
+                "subject": "Send",
+                "text": "Body",
+                "dryRun": False,
+                "confirmed": "false",
+            }))
+
+    def test_parse_bool_maps_strings_and_rejects_garbage(self):
+        self.assertIs(self.server._parse_bool(True), True)
+        self.assertIs(self.server._parse_bool(False), False)
+        self.assertIs(self.server._parse_bool("true"), True)
+        self.assertIs(self.server._parse_bool("false"), False)
+        self.assertIs(self.server._parse_bool(None), False)
+        self.assertIs(self.server._parse_bool(None, default=True), True)
+        with self.assertRaises(ValueError):
+            self.server._parse_bool("absolutely")
+
     def test_log_redaction_masks_secret_values(self):
         masked = self.server._mask_secret_text("Authorization: Bearer abc123 api_key=sk-live token:foo password='bar'")
         self.assertNotIn("abc123", masked)
