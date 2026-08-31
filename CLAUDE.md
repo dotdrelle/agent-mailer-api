@@ -1,6 +1,6 @@
 # Repository Guide
 
-Current coordinated release: **0.14.5**. Keep `_AGENT_VERSION` aligned with
+Current coordinated release: **0.15.66**. Keep `_AGENT_VERSION` aligned with
 the coordinated workspace stack.
 
 ## Goal
@@ -41,7 +41,7 @@ MailerSend API key in the service environment.
   for this service.
 - Keep `_AGENT_VERSION` aligned with the coordinated `llm-wiki-manager`
   release version so status responses identify the deployed agent bundle.
-  Current release line: `0.12.0`. Alignment is checked by
+  Current release line: `0.15.66`. Alignment is checked by
   `llm-wiki-manager/scripts/check-versions.js` and synced by the root
   `build-and-push.sh`.
 - **Auth, scopes, rate limiting** (0.10.3): `MCP_AUTH_TOKEN` remains a legacy
