@@ -1,0 +1,5 @@
+# Allow-list: the build context carries only what the Dockerfile copies.
+# `.env` holds the MailerSend API key — it must never reach the builder.
+# A new COPY needs its own line below, or the build fails with "not found".
+*
+!mailer_mcp_server.py
